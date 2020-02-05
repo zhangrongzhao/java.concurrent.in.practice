@@ -3,7 +3,8 @@ package com.zrz.chapter08;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.concurrent.Executor;
+import java.util.Queue;
+import java.util.concurrent.*;
 
 
 public class ParallelVSSequence {
@@ -47,6 +48,15 @@ public class ParallelVSSequence {
             });
             parallelRecursive(exec,node.getChildren(),results);
         }
+    }
+
+    public <T> Collection<T> getParallelResults(List<Node<T>> nodes)throws InterruptedException{
+        ExecutorService exec= Executors.newCachedThreadPool();
+        Queue<T> resultQueue=new ConcurrentLinkedQueue<T>();
+        parallelRecursive(exec,nodes,resultQueue);
+        exec.shutdown();
+        exec.awaitTermination(Long.MAX_VALUE, TimeUnit.SECONDS);
+        return resultQueue;
     }
 }
 
